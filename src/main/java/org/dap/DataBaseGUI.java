@@ -2,9 +2,7 @@ package org.dap;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.JTableHeader;
 import java.awt.*;
-import java.util.Stack;
 
 public class DataBaseGUI {
 
@@ -64,26 +62,26 @@ public class DataBaseGUI {
         JButton addButton = createButton("Añadir",new Color(143, 170, 71));
         addButton.addActionListener(e -> {
 
-
+            JPanel addPanel = AcceptPanel.createPanel();
             int result = JOptionPane.showConfirmDialog(
             null,
-            new AceptarPanel(),
+            addPanel,
             "Nuevo Producto",
             JOptionPane.OK_CANCEL_OPTION,
             JOptionPane.PLAIN_MESSAGE
             );
 
-//            if (result == JOptionPane.OK_OPTION) {
-//            String nombre = nombreField.getText();
-//            String precio = precioField.getText();
-//            String stock = stockField.getText();
-//
-//            System.out.println("Nombre: " + nombre);
-//            System.out.println("Precio: " + precio);
-//            System.out.println("Stock: " + stock);
-//            }
+            if (result == JOptionPane.OK_OPTION) {
+            String nombre = AcceptPanel.getName();
+            String descri = AcceptPanel.getDesc();
+            String precio = AcceptPanel.getPrice();
+            String stk = AcceptPanel.getStock();
 
-
+            System.out.println("Nombre: " + nombre);
+            System.out.println("Desc.: " + descri);
+            System.out.println("Precio: " + precio);
+            System.out.println("Stock: " + stk);
+            }
 
         });
 
