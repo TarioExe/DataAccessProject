@@ -9,7 +9,12 @@ public class DataBaseGUI {
     private static final int WIDTH_RES = 898;
     private static final int HEIGHT_RES = 509;
 
-    private static Object selectedItemID;
+    private static Object selectItemId;
+    private static Object selectItemName;
+    private static Object selectItemDesc;
+    private static Object selectItemPrice;
+    private static Object selectItemStock;
+
     private static DefaultTableModel model;
 
     private static final String[] columnas = {"ID","Nombre","Descripción","Precio €","Stock"};
@@ -66,7 +71,7 @@ public class DataBaseGUI {
             int result = JOptionPane.showConfirmDialog(
             null,
             addPanel,
-            "Nuevo Producto",
+            "Nuevo producto",
             JOptionPane.OK_CANCEL_OPTION,
             JOptionPane.PLAIN_MESSAGE
             );
@@ -88,11 +93,66 @@ public class DataBaseGUI {
         JButton modButton = createButton("Modificar",new Color(211, 166, 54));
         modButton.addActionListener(e -> {
 
+            try {
+                JPanel modPanel = ModifyPanel.createPanel(selectItemName.toString(),
+                        selectItemDesc.toString(),
+                        selectItemPrice.toString(),
+                        selectItemStock.toString());
+
+                int result = JOptionPane.showConfirmDialog(
+                        null,
+                        modPanel,
+                        "Modificar producto",
+                        JOptionPane.OK_CANCEL_OPTION,
+                        JOptionPane.PLAIN_MESSAGE
+                );
+
+                if (result == JOptionPane.OK_OPTION) {
+                    String nombre = ModifyPanel.getName();
+                    String descri = ModifyPanel.getDesc();
+                    String precio = ModifyPanel.getPrice();
+                    String stk = ModifyPanel.getStock();
+
+                    System.out.println("Nombre: " + nombre);
+                    System.out.println("Desc.: " + descri);
+                    System.out.println("Precio: " + precio);
+                    System.out.println("Stock: " + stk);
+                }
+
+            } catch (NullPointerException ex) {
+                JOptionPane.showMessageDialog(null, "Seleccione un elemento de la tabla, por favor.","Error",JOptionPane.PLAIN_MESSAGE);
+            }
+
         });
 
         JButton delButton = createButton("Eliminar",new Color(195, 60, 56));
         delButton.addActionListener(e -> {
 
+            try {
+                JPanel delPanel = DeletePanel.createPanel(selectItemName.toString(),
+                        selectItemDesc.toString(),
+                        selectItemPrice.toString(),
+                        selectItemStock.toString());
+
+
+                Object[] message = {"¿Está seguro de querer eliminar el siguiente producto?:",delPanel};
+                int result = JOptionPane.showConfirmDialog(
+                        null,
+                        message,
+                        "Eliminar producto",
+                        JOptionPane.OK_CANCEL_OPTION,
+                        JOptionPane.WARNING_MESSAGE
+                );
+
+                if (result == JOptionPane.OK_OPTION) {
+                    String id = selectItemName.toString();
+                    System.out.println("Elemento a eliminar: ID " + id);
+                    JOptionPane.showMessageDialog(null, "El producto se ha eliminado.","Borrado exitoso",JOptionPane.INFORMATION_MESSAGE);
+                }
+
+            } catch (NullPointerException ex) {
+                JOptionPane.showMessageDialog(null, "Seleccione un elemento de la tabla, por favor.","Error",JOptionPane.PLAIN_MESSAGE);
+            }
         });
 
         bottomPanel.add(addButton);
@@ -126,8 +186,11 @@ public class DataBaseGUI {
             if (!e.getValueIsAdjusting()) {
                 int selectedRow = table.getSelectedRow();
                 if (selectedRow != -1) {
-                    selectedItemID = table.getValueAt(selectedRow,0);
-                    System.out.println(selectedItemID);
+                    selectItemId = table.getValueAt(selectedRow,0);
+                    selectItemName = table.getValueAt(selectedRow,1);
+                    selectItemDesc = table.getValueAt(selectedRow,2);
+                    selectItemPrice = table.getValueAt(selectedRow,3);
+                    selectItemStock = table.getValueAt(selectedRow,4);
                 }
             }
         });

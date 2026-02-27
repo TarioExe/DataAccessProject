@@ -2,56 +2,44 @@ package org.dap;
 
 import javax.swing.*;
 
-public class AcceptPanel {
-    
-    private static JTextField nameField;
-    private static JTextArea descField;
-    private static JTextField priceField;
-    private static JTextField stockField;
+public class DeletePanel {
 
-    public static String getName() {
-        return nameField.getText();
-    }
+    public static JPanel createPanel(String name, String desc, String price, String stock) {
 
-    public static String getDesc() {
-        return descField.getText();
-    }
-
-    public static String getPrice() {
-        return priceField.getText();
-    }
-
-    public static String getStock() {
-        return stockField.getText();
-    }
-
-    public static JPanel createPanel() {
         SpringLayout layout = new SpringLayout();
         JPanel panel = new JPanel(layout);
 
         JLabel nameLabel = new JLabel("Nombre: ");
         panel.add(nameLabel);
 
-        nameField = new JTextField(20);
+        JTextField nameField = new JTextField(20);
+        nameField.setText(name);
+        nameField.setEditable(false);
         panel.add(nameField);
 
         JLabel descLabel = new JLabel("Descripción: ");
         panel.add(descLabel);
 
-        descField = new JTextArea(5,20);
+        JTextArea descField = new JTextArea(5,20);
+        descField.setText(desc);
+        descField.setEditable(false);
         JScrollPane descScroll = new JScrollPane(descField);
         panel.add(descScroll);
 
         JLabel priceLabel = new JLabel("Precio €: ");
         panel.add(priceLabel);
 
-        priceField = new JTextField(10);
+        JTextField priceField = new JTextField(10);
+        priceField.setText(price);
+        priceField.setEditable(false);
         panel.add(priceField);
 
         JLabel stockLabel = new JLabel("Stock: ");
         panel.add(stockLabel);
 
-        stockField = new JTextField(10);
+        JTextField stockField = new JTextField(10);
+        stockField.setText(stock);
+        stockField.setEditable(false);
         panel.add(stockField);
 
         // NAME
@@ -88,5 +76,4 @@ public class AcceptPanel {
 
         return panel;
     }
-
 }

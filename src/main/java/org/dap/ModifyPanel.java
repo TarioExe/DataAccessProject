@@ -2,8 +2,8 @@ package org.dap;
 
 import javax.swing.*;
 
-public class AcceptPanel {
-    
+public class ModifyPanel {
+
     private static JTextField nameField;
     private static JTextArea descField;
     private static JTextField priceField;
@@ -25,7 +25,8 @@ public class AcceptPanel {
         return stockField.getText();
     }
 
-    public static JPanel createPanel() {
+    public static JPanel createPanel(String name, String desc, String price, String stock) {
+
         SpringLayout layout = new SpringLayout();
         JPanel panel = new JPanel(layout);
 
@@ -33,12 +34,14 @@ public class AcceptPanel {
         panel.add(nameLabel);
 
         nameField = new JTextField(20);
+        nameField.setText(name);
         panel.add(nameField);
 
         JLabel descLabel = new JLabel("Descripción: ");
         panel.add(descLabel);
 
         descField = new JTextArea(5,20);
+        descField.setText(desc);
         JScrollPane descScroll = new JScrollPane(descField);
         panel.add(descScroll);
 
@@ -46,12 +49,14 @@ public class AcceptPanel {
         panel.add(priceLabel);
 
         priceField = new JTextField(10);
+        priceField.setText(price);
         panel.add(priceField);
 
         JLabel stockLabel = new JLabel("Stock: ");
         panel.add(stockLabel);
 
         stockField = new JTextField(10);
+        stockField.setText(stock);
         panel.add(stockField);
 
         // NAME
@@ -88,5 +93,4 @@ public class AcceptPanel {
 
         return panel;
     }
-
 }
