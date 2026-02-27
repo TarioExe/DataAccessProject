@@ -1,9 +1,12 @@
 package org.dap;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import java.awt.*;
 
 public class AcceptPanel {
-    
+
     private static JTextField nameField;
     private static JTextArea descField;
     private static JTextField priceField;
@@ -46,12 +49,62 @@ public class AcceptPanel {
         panel.add(priceLabel);
 
         priceField = new JTextField(10);
+        priceField.getDocument().addDocumentListener(new DocumentListener() {
+
+            private void update() {
+                if (!priceField.getText().matches("^\\d+(\\.\\d+)?$")) {
+                    priceField.setBorder(BorderFactory.createLineBorder(Color.RED));
+                } else {
+                    priceField.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+                }
+            }
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                update();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                update();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                update();
+            }
+        });
         panel.add(priceField);
 
         JLabel stockLabel = new JLabel("Stock: ");
         panel.add(stockLabel);
 
         stockField = new JTextField(10);
+        stockField.getDocument().addDocumentListener(new DocumentListener() {
+
+            private void update() {
+                if (!stockField.getText().matches("^\\d")) {
+                    stockField.setBorder(BorderFactory.createLineBorder(Color.RED));
+                } else {
+                    stockField.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+                }
+            }
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                update();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                update();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                update();
+            }
+        });
+
         panel.add(stockField);
 
         // NAME

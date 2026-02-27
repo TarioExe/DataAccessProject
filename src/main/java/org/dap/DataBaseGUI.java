@@ -1,8 +1,12 @@
 package org.dap;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 public class DataBaseGUI {
 
@@ -18,6 +22,16 @@ public class DataBaseGUI {
     private static DefaultTableModel model;
 
     private static final String[] columnas = {"ID","Nombre","Descripción","Precio €","Stock"};
+
+    private static ArrayList<Producto> productos = new ArrayList<>();
+
+    static {
+        for (int i = 0; i < 5; i++) {
+            Producto p = new Producto("Producto " + i, "Descr. " + i, 10+i, 150+i);
+            productos.add(p);
+        }
+    }
+
 
     public static void main(String[] args) {
         new DataBaseGUI();
@@ -38,8 +52,8 @@ public class DataBaseGUI {
         JLabel busquedaLabel = new JLabel("🔎");
         topPanel.add(busquedaLabel);
 
-        JTextField searchbar = new JTextField();
-        searchbar.setPreferredSize(new Dimension(400,20));
+        JTextField searchbar = getSearchbar();
+
         topPanel.add(searchbar);
 
         panel.add(topPanel,BorderLayout.NORTH);
@@ -48,11 +62,11 @@ public class DataBaseGUI {
         // MIDDLE PANEL (TABLE)
         JTable table = getJTable();
 
-        // Example data
-        for (int i = 0; i < 5; i++) {
-            Producto p = new Producto("Producto " + i, "Descr. " + i, 10+i, 150+i);
+        // EXAMPLE DATA !!!!!!!!!!!!!!!!!!
+        for (Producto p: productos) {
             model.addRow(new Object[]{p.getId(),p.getNombre(),p.getDescripcion(),p.getPrecio(),p.getStock()});
         }
+        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(BorderFactory.createEmptyBorder(20,20,20,20));
@@ -67,6 +81,7 @@ public class DataBaseGUI {
         JButton addButton = createButton("Añadir",new Color(143, 170, 71));
         addButton.addActionListener(e -> {
 
+            boolean error = false;
             JPanel addPanel = AcceptPanel.createPanel();
             int result = JOptionPane.showConfirmDialog(
             null,
@@ -77,15 +92,30 @@ public class DataBaseGUI {
             );
 
             if (result == JOptionPane.OK_OPTION) {
-            String nombre = AcceptPanel.getName();
-            String descri = AcceptPanel.getDesc();
-            String precio = AcceptPanel.getPrice();
-            String stk = AcceptPanel.getStock();
+                String nombre = AcceptPanel.getName();
+                String descri = AcceptPanel.getDesc();
+                double precio = 0;
+                try {
+                   precio = Double.parseDouble(AcceptPanel.getPrice());
+                } catch (NumberFormatException ex) {
+                    error = true;
+                }
 
-            System.out.println("Nombre: " + nombre);
-            System.out.println("Desc.: " + descri);
-            System.out.println("Precio: " + precio);
-            System.out.println("Stock: " + stk);
+                int stk = 0;
+                try {
+                    stk = Integer.parseInt(AcceptPanel.getStock());
+                } catch (NumberFormatException ex) {
+                    error = true;
+                }
+
+                if (!error) {
+                    Producto p = new Producto(nombre,descri,precio,stk);
+                    productos.add(p);
+                    updateTable(productos);
+                } else {
+                    JOptionPane.showMessageDialog(null, "Los datos no coinciden\ncon los valores de la tabla","Error al insertar",JOptionPane.ERROR_MESSAGE);
+
+                }
             }
 
         });
@@ -120,7 +150,7 @@ public class DataBaseGUI {
                 }
 
             } catch (NullPointerException ex) {
-                JOptionPane.showMessageDialog(null, "Seleccione un elemento de la tabla, por favor.","Error",JOptionPane.PLAIN_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Seleccione un elemento de la tabla, por favor.","Error al seleccionar",JOptionPane.ERROR_MESSAGE);
             }
 
         });
@@ -151,7 +181,7 @@ public class DataBaseGUI {
                 }
 
             } catch (NullPointerException ex) {
-                JOptionPane.showMessageDialog(null, "Seleccione un elemento de la tabla, por favor.","Error",JOptionPane.PLAIN_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Seleccione un elemento de la tabla, por favor.","Error al seleccionar",JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -164,6 +194,43 @@ public class DataBaseGUI {
 
         frame.add(panel);
         frame.setVisible(true);
+    }
+
+    private static JTextField getSearchbar() {
+        JTextField searchbar = new JTextField();
+        searchbar.setPreferredSize(new Dimension(400,20));
+
+
+        searchbar.getDocument().addDocumentListener(new DocumentListener() {
+
+            private void update() {
+                if (!searchbar.getText().isEmpty()) {
+                    ArrayList<Producto> filter = (ArrayList<Producto>) productos.stream()
+                            .filter(p -> p.getNombre().toLowerCase().contains(searchbar.getText().toLowerCase()))
+                            .collect(Collectors.toList());
+
+                    updateTable(filter);
+                } else {
+                    updateTable(productos);
+                }
+            }
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                update();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                update();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                update();
+            }
+        });
+        return searchbar;
     }
 
     private static JTable getJTable() {
@@ -204,5 +271,13 @@ public class DataBaseGUI {
         button.setFont(new Font("Arial",Font.PLAIN,18));
 
         return button;
+    }
+
+    private static void updateTable(ArrayList<Producto> producto) {
+        model.setRowCount(0);
+        for (Producto p : producto) {
+            model.addRow(new Object[]{p.getId(),p.getNombre(),p.getDescripcion(),p.getPrecio(),p.getStock()});
+
+        }
     }
 }
