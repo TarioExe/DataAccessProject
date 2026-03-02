@@ -3,7 +3,6 @@ Trabajo final de Acceso a Datos
 
 POR HACER:
 
-- Arreglar ModifyPanel(). Tiene que detectar como AcceptPanel() si hay algún campo erróneo para evitar que se modifique en caso positivo.
 - Crear la BBDD
 - Añadir las funcionalidades con la BBDD:
 
