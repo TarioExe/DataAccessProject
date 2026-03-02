@@ -81,72 +81,39 @@ public class DataBaseGUI {
         JButton addButton = createButton("Añadir",new Color(143, 170, 71));
         addButton.addActionListener(e -> {
 
-            boolean error = false;
-            JPanel addPanel = AcceptPanel.createPanel();
-            int result = JOptionPane.showConfirmDialog(
-            null,
-            addPanel,
-            "Nuevo producto",
-            JOptionPane.OK_CANCEL_OPTION,
-            JOptionPane.PLAIN_MESSAGE
-            );
+            DialogWindow addDialog = new DialogWindow(new JFrame());
+            addDialog.setVisible(true);
 
-            if (result == JOptionPane.OK_OPTION) {
-                String nombre = AcceptPanel.getName();
-                String descri = AcceptPanel.getDesc();
-                double precio = 0;
-                try {
-                   precio = Double.parseDouble(AcceptPanel.getPrice());
-                } catch (NumberFormatException ex) {
-                    error = true;
-                }
-
-                int stk = 0;
-                try {
-                    stk = Integer.parseInt(AcceptPanel.getStock());
-                } catch (NumberFormatException ex) {
-                    error = true;
-                }
-
-                if (!error) {
-                    Producto p = new Producto(nombre,descri,precio,stk);
-                    productos.add(p);
-                    updateTable(productos);
-                } else {
-                    JOptionPane.showMessageDialog(null, "Los datos no coinciden\ncon los valores de la tabla","Error al insertar",JOptionPane.ERROR_MESSAGE);
-
-                }
+            if (addDialog.isConfirm()) {
+                Producto p = new Producto(addDialog.getName(),
+                        addDialog.getDesc(),
+                        addDialog.getPrice(),
+                        addDialog.getStock());
+                productos.add(p);
+                updateTable(productos);
             }
-
         });
 
         JButton modButton = createButton("Modificar",new Color(211, 166, 54));
         modButton.addActionListener(e -> {
 
             try {
-                JPanel modPanel = ModifyPanel.createPanel(selectItemName.toString(),
+                DialogWindow addDialog = new DialogWindow(new JFrame(),
+                        selectItemName.toString(),
                         selectItemDesc.toString(),
                         selectItemPrice.toString(),
                         selectItemStock.toString());
+                addDialog.setVisible(true);
 
-                int result = JOptionPane.showConfirmDialog(
-                        null,
-                        modPanel,
-                        "Modificar producto",
-                        JOptionPane.OK_CANCEL_OPTION,
-                        JOptionPane.PLAIN_MESSAGE
-                );
+                if (addDialog.isConfirm()) {
+                    Producto p = new Producto(addDialog.getName(),
+                            addDialog.getDesc(),
+                            addDialog.getPrice(),
+                            addDialog.getStock());
 
-                if (result == JOptionPane.OK_OPTION) {
-                    String nombre = ModifyPanel.getName();
-                    String descri = ModifyPanel.getDesc();
-                    String precio = ModifyPanel.getPrice();
-                    String stk = ModifyPanel.getStock();
-
-                    System.out.println("Nombre: " + nombre);
-                    System.out.println("Desc.: " + descri);
-                    System.out.println("Precio: " + precio);
-                    System.out.println("Stock: " + stk);
+                    productos.remove(table.getSelectedRow());
+                    productos.add(p);
+                    updateTable(productos);
                 }
 
             } catch (NullPointerException ex) {
@@ -175,8 +142,8 @@ public class DataBaseGUI {
                 );
 
                 if (result == JOptionPane.OK_OPTION) {
-                    String id = selectItemName.toString();
-                    System.out.println("Elemento a eliminar: ID " + id);
+                    productos.remove(table.getSelectedRow());
+                    updateTable(productos);
                     JOptionPane.showMessageDialog(null, "El producto se ha eliminado.","Borrado exitoso",JOptionPane.INFORMATION_MESSAGE);
                 }
 

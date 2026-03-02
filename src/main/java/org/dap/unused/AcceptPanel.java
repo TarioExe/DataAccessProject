@@ -1,8 +1,11 @@
-package org.dap;
+package org.dap.unused;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import java.awt.*;
 
-public class ModifyPanel {
+public class AcceptPanel {
 
     private static JTextField nameField;
     private static JTextArea descField;
@@ -25,8 +28,7 @@ public class ModifyPanel {
         return stockField.getText();
     }
 
-    public static JPanel createPanel(String name, String desc, String price, String stock) {
-
+    public static JPanel createPanel() {
         SpringLayout layout = new SpringLayout();
         JPanel panel = new JPanel(layout);
 
@@ -34,14 +36,12 @@ public class ModifyPanel {
         panel.add(nameLabel);
 
         nameField = new JTextField(20);
-        nameField.setText(name);
         panel.add(nameField);
 
         JLabel descLabel = new JLabel("Descripción: ");
         panel.add(descLabel);
 
         descField = new JTextArea(5,20);
-        descField.setText(desc);
         JScrollPane descScroll = new JScrollPane(descField);
         panel.add(descScroll);
 
@@ -49,14 +49,62 @@ public class ModifyPanel {
         panel.add(priceLabel);
 
         priceField = new JTextField(10);
-        priceField.setText(price);
+        priceField.getDocument().addDocumentListener(new DocumentListener() {
+
+            private void update() {
+                if (!priceField.getText().matches("^\\d+(\\.\\d+)?$")) {
+                    priceField.setBorder(BorderFactory.createLineBorder(Color.RED));
+                } else {
+                    priceField.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+                }
+            }
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                update();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                update();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                update();
+            }
+        });
         panel.add(priceField);
 
         JLabel stockLabel = new JLabel("Stock: ");
         panel.add(stockLabel);
 
         stockField = new JTextField(10);
-        stockField.setText(stock);
+        stockField.getDocument().addDocumentListener(new DocumentListener() {
+
+            private void update() {
+                if (!stockField.getText().matches("^\\d")) {
+                    stockField.setBorder(BorderFactory.createLineBorder(Color.RED));
+                } else {
+                    stockField.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+                }
+            }
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                update();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                update();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                update();
+            }
+        });
+
         panel.add(stockField);
 
         // NAME
@@ -93,4 +141,5 @@ public class ModifyPanel {
 
         return panel;
     }
+
 }
