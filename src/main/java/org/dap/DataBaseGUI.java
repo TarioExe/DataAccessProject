@@ -32,11 +32,6 @@ public class DataBaseGUI {
         }
     }
 
-
-    public static void main(String[] args) {
-        new DataBaseGUI();
-    }
-
     public DataBaseGUI() {
 
         JFrame frame = new JFrame("Almacén");
