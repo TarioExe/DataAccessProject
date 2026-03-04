@@ -10,17 +10,17 @@ public class Producto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String nombre;
-    private String descripcion;
-    private double precio;
+    private String name;
+    private String description;
+    private double price;
     private int stock;
 
     public Producto() {}
 
     public Producto(String nombre, String descripcion, double price, int stock) {
-        this.nombre = nombre;
-        this.descripcion = descripcion;
-        this.precio = price;
+        this.name = nombre;
+        this.description = descripcion;
+        this.price = price;
         this.stock = stock;
     }
 
@@ -32,28 +32,28 @@ public class Producto {
         this.id = id;
     }
 
-    public String getNombre() {
-        return nombre;
+    public String getName() {
+        return name;
     }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getDescripcion() {
-        return descripcion;
+    public String getDescription() {
+        return description;
     }
 
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public double getPrecio() {
-        return precio;
+    public double getPrice() {
+        return price;
     }
 
-    public void setPrecio(double precio) {
-        this.precio = precio;
+    public void setPrice(double price) {
+        this.price = price;
     }
 
     public int getStock() {
@@ -67,9 +67,9 @@ public class Producto {
     @Override
     public String toString() {
         return "ID " + id +
-                "\nNombre: " + nombre +
-                "\nDescripcion: " + descripcion +
-                "\nPrecio: " + precio + "€" +
+                "\nNombre: " + name +
+                "\nDescripcion: " + description +
+                "\nPrecio: " + price + "€" +
                 "\nStock: " + stock + "ud/s";
     }
 }

@@ -1,11 +1,16 @@
 package org.dap;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
+
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class DataBaseGUI {
@@ -19,18 +24,12 @@ public class DataBaseGUI {
     private static Object selectItemPrice;
     private static Object selectItemStock;
 
+    private static EntityManagerFactory emf = Persistence.createEntityManagerFactory("DataAccessProject");
+    private static EntityManager em = emf.createEntityManager();
+
     private static DefaultTableModel model;
 
     private static final String[] columnas = {"ID","Nombre","Descripción","Precio €","Stock"};
-
-    private static ArrayList<Producto> productos = new ArrayList<>();
-
-    static {
-        for (int i = 0; i < 5; i++) {
-            Producto p = new Producto("Producto " + i, "Descr. " + i, 10+i, 150+i);
-            productos.add(p);
-        }
-    }
 
     public DataBaseGUI() {
 
@@ -57,12 +56,6 @@ public class DataBaseGUI {
         // MIDDLE PANEL (TABLE)
         JTable table = getJTable();
 
-        // EXAMPLE DATA !!!!!!!!!!!!!!!!!!
-        for (Producto p: productos) {
-            model.addRow(new Object[]{p.getId(),p.getNombre(),p.getDescripcion(),p.getPrecio(),p.getStock()});
-        }
-        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(BorderFactory.createEmptyBorder(20,20,20,20));
         scrollPane.setOpaque(false);
@@ -74,78 +67,13 @@ public class DataBaseGUI {
         JPanel bottomPanel = new JPanel();
 
         JButton addButton = createButton("Añadir",new Color(143, 170, 71));
-        addButton.addActionListener(e -> {
-
-            DialogWindow addDialog = new DialogWindow(new JFrame());
-            addDialog.setVisible(true);
-
-            if (addDialog.isConfirm()) {
-                Producto p = new Producto(addDialog.getName(),
-                        addDialog.getDesc(),
-                        addDialog.getPrice(),
-                        addDialog.getStock());
-                productos.add(p);
-                updateTable(productos);
-            }
-        });
+        addButton.addActionListener(e -> addButtonAction());
 
         JButton modButton = createButton("Modificar",new Color(211, 166, 54));
-        modButton.addActionListener(e -> {
-
-            try {
-                DialogWindow addDialog = new DialogWindow(new JFrame(),
-                        selectItemName.toString(),
-                        selectItemDesc.toString(),
-                        selectItemPrice.toString(),
-                        selectItemStock.toString());
-                addDialog.setVisible(true);
-
-                if (addDialog.isConfirm()) {
-                    Producto p = new Producto(addDialog.getName(),
-                            addDialog.getDesc(),
-                            addDialog.getPrice(),
-                            addDialog.getStock());
-
-                    productos.remove(table.getSelectedRow());
-                    productos.add(p);
-                    updateTable(productos);
-                }
-
-            } catch (NullPointerException ex) {
-                JOptionPane.showMessageDialog(null, "Seleccione un elemento de la tabla, por favor.","Error al seleccionar",JOptionPane.ERROR_MESSAGE);
-            }
-
-        });
+        modButton.addActionListener(e -> modifyButtonAction(table));
 
         JButton delButton = createButton("Eliminar",new Color(195, 60, 56));
-        delButton.addActionListener(e -> {
-
-            try {
-                JPanel delPanel = DeletePanel.createPanel(selectItemName.toString(),
-                        selectItemDesc.toString(),
-                        selectItemPrice.toString(),
-                        selectItemStock.toString());
-
-
-                Object[] message = {"¿Está seguro de querer eliminar el siguiente producto?:",delPanel};
-                int result = JOptionPane.showConfirmDialog(
-                        null,
-                        message,
-                        "Eliminar producto",
-                        JOptionPane.OK_CANCEL_OPTION,
-                        JOptionPane.WARNING_MESSAGE
-                );
-
-                if (result == JOptionPane.OK_OPTION) {
-                    productos.remove(table.getSelectedRow());
-                    updateTable(productos);
-                    JOptionPane.showMessageDialog(null, "El producto se ha eliminado.","Borrado exitoso",JOptionPane.INFORMATION_MESSAGE);
-                }
-
-            } catch (NullPointerException ex) {
-                JOptionPane.showMessageDialog(null, "Seleccione un elemento de la tabla, por favor.","Error al seleccionar",JOptionPane.ERROR_MESSAGE);
-            }
-        });
+        delButton.addActionListener(e -> deleteButtonAction(table));
 
         bottomPanel.add(addButton);
         bottomPanel.add(modButton);
@@ -153,6 +81,7 @@ public class DataBaseGUI {
 
         panel.add(bottomPanel,BorderLayout.SOUTH);
         // ------------------------------------
+        updateTable();
 
         frame.add(panel);
         frame.setVisible(true);
@@ -166,15 +95,14 @@ public class DataBaseGUI {
         searchbar.getDocument().addDocumentListener(new DocumentListener() {
 
             private void update() {
-                if (!searchbar.getText().isEmpty()) {
-                    ArrayList<Producto> filter = (ArrayList<Producto>) productos.stream()
-                            .filter(p -> p.getNombre().toLowerCase().contains(searchbar.getText().toLowerCase()))
-                            .collect(Collectors.toList());
-
-                    updateTable(filter);
-                } else {
-                    updateTable(productos);
-                }
+//                if (!searchbar.getText().isEmpty()) {
+//                    List<Producto> filter =  productos.stream()
+//                            .filter(p -> p.getName().toLowerCase().contains(searchbar.getText().toLowerCase())).toList();
+//
+//                    updateTable(filter);
+//                } else {
+//                    updateTable(productos);
+//                }
             }
 
             @Override
@@ -235,11 +163,82 @@ public class DataBaseGUI {
         return button;
     }
 
-    private static void updateTable(ArrayList<Producto> producto) {
+    private static void updateTable() {
+        List<Producto> productos = em.createQuery("FROM Producto", Producto.class).getResultList();
         model.setRowCount(0);
-        for (Producto p : producto) {
-            model.addRow(new Object[]{p.getId(),p.getNombre(),p.getDescripcion(),p.getPrecio(),p.getStock()});
+        for (Producto p : productos) {
+            model.addRow(new Object[]{p.getId(),p.getName(),p.getDescription(),p.getPrice(),p.getStock()});
+        }
+    }
 
+    private static void addButtonAction() {
+        DialogWindow addDialog = new DialogWindow(new JFrame());
+        addDialog.setVisible(true);
+
+        if (addDialog.isConfirm()) {
+            Producto p = new Producto(addDialog.getName(),
+                    addDialog.getDesc(),
+                    addDialog.getPrice(),
+                    addDialog.getStock());
+            //productos.add(p);
+            updateTable();
+        }
+    }
+
+    private static void modifyButtonAction(JTable table) {
+        try {
+            DialogWindow addDialog = new DialogWindow(new JFrame(),
+                    selectItemName.toString(),
+                    selectItemDesc.toString(),
+                    selectItemPrice.toString(),
+                    selectItemStock.toString());
+            addDialog.setVisible(true);
+
+            if (addDialog.isConfirm()) {
+
+                em.getTransaction().begin();
+                Producto p = em.find(Producto.class, selectItemId);
+                if (p != null) {
+                   p.setName(addDialog.getName());
+                   p.setDescription(addDialog.getDesc());
+                   p.setPrice(addDialog.getPrice());
+                   p.setStock(addDialog.getStock());
+                }
+                em.getTransaction().commit();
+                updateTable();
+                JOptionPane.showMessageDialog(null, "El producto se ha modificado.","Modificación exitosa",JOptionPane.INFORMATION_MESSAGE);
+            }
+
+        } catch (NullPointerException ex) {
+            JOptionPane.showMessageDialog(null, "Seleccione un elemento de la tabla, por favor.","Error al seleccionar",JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private static void deleteButtonAction(JTable table) {
+        try {
+            JPanel delPanel = DeletePanel.createPanel(selectItemName.toString(),
+                    selectItemDesc.toString(),
+                    selectItemPrice.toString(),
+                    selectItemStock.toString());
+
+
+            Object[] message = {"¿Está seguro de querer eliminar el siguiente producto?:",delPanel};
+            int result = JOptionPane.showConfirmDialog(
+                    null,
+                    message,
+                    "Eliminar producto",
+                    JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.WARNING_MESSAGE
+            );
+
+            if (result == JOptionPane.OK_OPTION) {
+                //productos.remove(table.getSelectedRow());
+                updateTable();
+                JOptionPane.showMessageDialog(null, "El producto se ha eliminado.","Borrado exitoso",JOptionPane.INFORMATION_MESSAGE);
+            }
+
+        } catch (NullPointerException ex) {
+            JOptionPane.showMessageDialog(null, "Seleccione un elemento de la tabla, por favor.","Error al seleccionar",JOptionPane.ERROR_MESSAGE);
         }
     }
 }
