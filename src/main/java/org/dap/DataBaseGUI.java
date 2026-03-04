@@ -9,9 +9,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class DataBaseGUI {
 
@@ -28,6 +26,7 @@ public class DataBaseGUI {
     private static EntityManager em = emf.createEntityManager();
 
     private static DefaultTableModel model;
+    private static String searchbarFilter = "";
 
     private static final String[] columnas = {"ID","Nombre","Descripción","Precio €","Stock"};
 
@@ -95,14 +94,9 @@ public class DataBaseGUI {
         searchbar.getDocument().addDocumentListener(new DocumentListener() {
 
             private void update() {
-//                if (!searchbar.getText().isEmpty()) {
-//                    List<Producto> filter =  productos.stream()
-//                            .filter(p -> p.getName().toLowerCase().contains(searchbar.getText().toLowerCase())).toList();
-//
-//                    updateTable(filter);
-//                } else {
-//                    updateTable(productos);
-//                }
+                searchbarFilter = searchbar.getText();
+                if (searchbarFilter.isBlank()) searchbarFilter = "";
+                updateTable();
             }
 
             @Override
@@ -152,6 +146,13 @@ public class DataBaseGUI {
             }
         });
 
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        table.getColumnModel().getColumn(0).setPreferredWidth(50);
+        table.getColumnModel().getColumn(1).setPreferredWidth(150);
+        table.getColumnModel().getColumn(2).setPreferredWidth(492);
+        table.getColumnModel().getColumn(3).setPreferredWidth(100);
+        table.getColumnModel().getColumn(4).setPreferredWidth(50);
+
         return table;
     }
 
@@ -164,7 +165,8 @@ public class DataBaseGUI {
     }
 
     private static void updateTable() {
-        List<Producto> productos = em.createQuery("FROM Producto", Producto.class).getResultList();
+        List<Producto> productos = em.createQuery("FROM Producto", Producto.class).getResultList()
+                .stream().filter(p -> p.getName().toLowerCase().contains(searchbarFilter.toLowerCase())).toList();
         model.setRowCount(0);
         for (Producto p : productos) {
             model.addRow(new Object[]{p.getId(),p.getName(),p.getDescription(),p.getPrice(),p.getStock()});
