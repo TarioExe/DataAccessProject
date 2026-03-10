@@ -1,9 +1,11 @@
 package org.dap;
 
+import java.awt.*;
+
 public class Main {
 
     public static void main(String[] args) {
 
-        new DataBaseGUI();
+        EventQueue.invokeLater(() -> new DataBaseGUI());
     }
 }
