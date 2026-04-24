@@ -182,7 +182,9 @@ public class DataBaseGUI {
                     addDialog.getDesc(),
                     addDialog.getPrice(),
                     addDialog.getStock());
-            //productos.add(p);
+            em.getTransaction().begin();
+            em.persist(p);
+            em.getTransaction().commit();
             updateTable();
         }
     }
