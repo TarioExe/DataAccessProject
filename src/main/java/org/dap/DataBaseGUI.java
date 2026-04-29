@@ -236,7 +236,10 @@ public class DataBaseGUI {
             );
 
             if (result == JOptionPane.OK_OPTION) {
-                //productos.remove(table.getSelectedRow());
+                Producto p = em.find(Producto.class, selectItemId);
+                em.getTransaction().begin();
+                em.remove(p);
+                em.getTransaction().commit();
                 updateTable();
                 JOptionPane.showMessageDialog(null, "El producto se ha eliminado.","Borrado exitoso",JOptionPane.INFORMATION_MESSAGE);
             }
