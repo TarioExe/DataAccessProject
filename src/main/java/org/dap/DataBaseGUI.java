@@ -72,7 +72,7 @@ public class DataBaseGUI {
         modButton.addActionListener(e -> modifyButtonAction(table));
 
         JButton delButton = createButton("Eliminar",new Color(195, 60, 56));
-        delButton.addActionListener(e -> deleteButtonAction(table));
+        delButton.addActionListener(e -> deleteButtonAction());
 
         bottomPanel.add(addButton);
         bottomPanel.add(modButton);
@@ -210,6 +210,11 @@ public class DataBaseGUI {
                 }
                 em.getTransaction().commit();
                 updateTable();
+                selectItemId = null;
+                selectItemName = null;
+                selectItemDesc = null;
+                selectItemPrice = null;
+                selectItemStock = null;
                 JOptionPane.showMessageDialog(null, "El producto se ha modificado.","Modificación exitosa",JOptionPane.INFORMATION_MESSAGE);
             }
 
@@ -218,7 +223,7 @@ public class DataBaseGUI {
         }
     }
 
-    private static void deleteButtonAction(JTable table) {
+    private static void deleteButtonAction( ) {
         try {
             JPanel delPanel = DeletePanel.createPanel(selectItemName.toString(),
                     selectItemDesc.toString(),
@@ -241,7 +246,13 @@ public class DataBaseGUI {
                 em.remove(p);
                 em.getTransaction().commit();
                 updateTable();
+                selectItemId = null;
+                selectItemName = null;
+                selectItemDesc = null;
+                selectItemPrice = null;
+                selectItemStock = null;
                 JOptionPane.showMessageDialog(null, "El producto se ha eliminado.","Borrado exitoso",JOptionPane.INFORMATION_MESSAGE);
+
             }
 
         } catch (NullPointerException ex) {
