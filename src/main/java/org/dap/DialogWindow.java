@@ -194,6 +194,7 @@ public class DialogWindow extends JDialog {
         };
 
         nameField.getDocument().addDocumentListener(updater);
+        descField.getDocument().addDocumentListener(updater);
         priceField.getDocument().addDocumentListener(updater);
         stockField.getDocument().addDocumentListener(updater);
 
